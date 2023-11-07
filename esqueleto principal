@@ -4,12 +4,20 @@ class Pedido:
         self.bebidas = bebidas
         self.opciones_personalizadas = opciones_personalizadas
 
+
 class Inventario:
     def __init__(self, productos):
         self.productos = productos
 
     def actualizar_inventario(self, pedido):
-        pass
+        for alimento in pedido.alimentos:
+            if alimento in self.productos:
+                self.productos[alimento] -= 1
+
+        for bebida in pedido.bebidas:
+            if bebida in self.productos:
+                self.productos[bebida] -= 1
+
 
 class Menu:
     def __init__(self, platillos, bebidas, precios):
@@ -18,27 +26,62 @@ class Menu:
         self.precios = precios
 
     def mostrar_menu(self):
-        pass
+        print("Menu:")
+
+        for i in range(len(self.platillos)):
+            print(f"{i+1}. {self.platillos[i]} - Q{self.precios[i]}")
+
+        for i in range(len(self.bebidas)):
+            print(f"{i+len(self.platillos)+1}. {self.bebidas[i]} - ${self.precios[i+len(self.platillos)]}")
+
 
 class ColaPedidos:
     def __init__(self, pedidos):
         self.pedidos = pedidos
 
     def agregar_pedido(self, pedido):
-        pass
+        self.pedidos.append(pedido)
 
     def mostrar_pedidos(self):
-        pass
+        if not self.pedidos:
+            print("La cola de pedidos está vacía.")
+        else:
+            print("Cola de Pedidos:")
+            for i, pedido in enumerate(self.pedidos):
+                print(f"Pedido {i + 1}: {pedido.alimentos}, {pedido.bebidas}, {pedido.opciones_personalizadas}")
+
 
 class Facturacion:
     def __init__(self, pedidos):
         self.pedidos = pedidos
 
-    def generar_factura(self, pedido):
-        pass
 
-    def procesar_pago(self, pedido, metodo_pago):
-        pass
+    def generar_factura(self, pedido):
+        print("-"*40)
+        print("\n---*** Factura ***---")
+        print("Teléfono de contacto: 8894-4563")
+        print("-" * 40)
+        print("Descripción del pedido:")
+
+        for alimento in pedido.alimentos:
+            print(f" {alimento}: ${menu.precios[menu.platillos.index(alimento)]}")
+
+        for bebida in pedido.bebidas:
+            print(f" {bebida}: ${menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)]}")
+
+        print("-" * 30)
+
+        total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
+                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
+        print(f"Total a pagar: ${total}")
+        print("¡Gracias por su compra!")
+        print("-" * 30)
+        print("")
+        print("")
+
+    def procesar_pago(self, metodo_pago):
+        print(f"Pago del pedido procesado con {metodo_pago}")
+
 
 class Cliente:
     def __init__(self, nombre, direccion, telefono):
@@ -46,24 +89,78 @@ class Cliente:
         self.direccion = direccion
         self.telefono = telefono
 
+
 class AdministracionClientes:
     def __init__(self, clientes):
         self.clientes = clientes
 
     def agregar_cliente(self, cliente):
-        pass
+        self.clientes.append(cliente)
 
     def mostrar_clientes(self):
-        pass
+        if not self.clientes:
+            print("No hay clientes registrados.")
+        else:
+            print("Lista de Clientes:")
+            for i, cliente in enumerate(self.clientes):
+                print(f"Cliente {i + 1}: {cliente.nombre}, {cliente.direccion}, {cliente.telefono}")
 
+
+menu = Menu(["Hamburguesa", "Pizza"], ["Refresco", "Agua"], [25, 40, 10, 7])
+inventario = Inventario({"Hamburguesa": 10, "Pizza": 5, "Refresco": 20, "Agua": 15})
+cola_pedidos = ColaPedidos([])
+facturacion = Facturacion([])
+admin_clientes = AdministracionClientes([])
 
 while True:
-    print("Bienvenido al sistema de gestión de pedidos.")
-    print("Por favor, seleccione una opción:")
-    print("1. Tomar un pedido")
-    print("2. Ver la cola de pedidos")
-    print("3. Generar una factura")
-    print("4. Salir")
-
+    print("-"*45)
+    print("|  Bienvenido al restaurante Rata feliz :3.")
+    print("|")
+    print("|  Por favor, seleccione una opción:")
+    print("|  1. Tomar un pedido")
+    print("|  2. Ver la cola de pedidos")
+    print("|  3. Generar una factura")
+    print("|  4. Salir")
+    print("-"*45)
     opcion = input("Opción: ")
 
+    if opcion == "1":
+        menu.mostrar_menu()
+        alimentos = []
+        bebidas = []
+        opciones_personalizadas = []
+
+        while True:
+            opcion = input("Seleccione lo que desea consumir (presione 0 para terminar): ")
+
+            if opcion == "0":
+                break
+            elif opcion.isdigit() and int(opcion) in range(1, len(menu.platillos) + len(menu.bebidas) + 1):
+
+                opcion = int(opcion)
+
+                if opcion <= len(menu.platillos):
+                    alimentos.append(menu.platillos[opcion - 1])
+                else:
+                    bebidas.append(menu.bebidas[opcion - len(menu.platillos) - 1])
+
+        pedido = Pedido(alimentos, bebidas, opciones_personalizadas)
+        cola_pedidos.agregar_pedido(pedido)
+        inventario.actualizar_inventario(pedido)
+
+    elif opcion == "2":
+        cola_pedidos.mostrar_pedidos()
+
+    elif opcion == "3":
+        if cola_pedidos.pedidos:
+            facturacion.generar_factura(cola_pedidos.pedidos[0])
+            facturacion.procesar_pago(cola_pedidos.pedidos[0])
+            cola_pedidos.pedidos.pop(0)
+        else:
+            print("No hay pedidos en la cola.")
+
+    elif opcion == "4":
+        break
+
+    else:
+        print("Opción inválida. Por favor, seleccione una opción válida.")
