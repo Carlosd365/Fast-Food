@@ -32,7 +32,7 @@ class Menu:
             print(f"{i+1}. {self.platillos[i]} - Q{self.precios[i]}")
 
         for i in range(len(self.bebidas)):
-            print(f"{i+len(self.platillos)+1}. {self.bebidas[i]} - ${self.precios[i+len(self.platillos)]}")
+            print(f"{i+len(self.platillos)+1}. {self.bebidas[i]} - Q{self.precios[i+len(self.platillos)]}")
 
 
 class ColaPedidos:
@@ -64,16 +64,16 @@ class Facturacion:
         print("Descripción del pedido:")
 
         for alimento in pedido.alimentos:
-            print(f" {alimento}: ${menu.precios[menu.platillos.index(alimento)]}")
+            print(f" {alimento}: Q{menu.precios[menu.platillos.index(alimento)]}")
 
         for bebida in pedido.bebidas:
-            print(f" {bebida}: ${menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)]}")
+            print(f" {bebida}: Q{menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)]}")
 
         print("-" * 30)
 
         total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
                     [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
-        print(f"Total a pagar: ${total}")
+        print(f"Total a pagar: Q{total}")
         print("¡Gracias por su compra!")
         print("-" * 30)
         print("")
