@@ -66,4 +66,3 @@ while True:
     print("4. Salir")
 
     opcion = input("Opción: ")
-
