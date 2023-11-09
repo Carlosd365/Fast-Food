@@ -127,7 +127,7 @@ class AdministracionClientes:
         return -1
 
 menu = Menu(["Hamburguesa🍔", "Pizza🍕"], ["Refresco🧋", "Agua🫗"], [25, 40, 10, 7])
-inventario = Inventario({"Hamburguesa": 10, "Pizza": 5, "Refresco": 20, "Agua": 15})
+inventario = Inventario({"Hamburguesa🍔": 10, "Pizza🍕": 5, "Refresco🧋": 20, "Agua🫗": 15})
 cola_pedidos = ColaPedidos([])
 facturacion = Facturacion([])
 admin_clientes = AdministracionClientes([])
