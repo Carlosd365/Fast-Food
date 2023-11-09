@@ -12,13 +12,31 @@ class Inventario:
 
     def actualizar_inventario(self, pedido):
         for alimento in pedido.alimentos:
-            if alimento in self.productos:
+            if alimento in self.productos and self.productos[alimento] > 0:
                 self.productos[alimento] -= 1
+            else:
+                print(f"No hay suficiente catidad de {alimento} en el inventario. El pedido no se agregará.")
+                return False
 
         for bebida in pedido.bebidas:
-            if bebida in self.productos:
+            if bebida in self.productos and self.productos[bebida] > 0:
                 self.productos[bebida] -= 1
+            else:
+                print(f"No hay suficiente cantidad de {bebida} en el inventario. El pedido no se agregará.")
+                return False
 
+        return True
+
+    def agregar_inventario(self, producto, cantidad):
+        if producto in self.productos:
+            self.productos[producto] += cantidad
+        else:
+            self.productos[producto] = cantidad
+
+    def mostrar_inventario(self):
+        print("Inventario:")
+        for producto, cantidad in self.productos.items():
+            print(f"{producto}: {cantidad}")
 
 class Menu:
     def __init__(self, platillos, bebidas, precios):
@@ -108,7 +126,7 @@ class AdministracionClientes:
                 return i
         return -1
 
-menu = Menu(["Hamburguesa", "Pizza"], ["Refresco", "Agua"], [25, 40, 10, 7])
+menu = Menu(["Hamburguesa🍔", "Pizza🍕"], ["Refresco🧋", "Agua🫗"], [25, 40, 10, 7])
 inventario = Inventario({"Hamburguesa": 10, "Pizza": 5, "Refresco": 20, "Agua": 15})
 cola_pedidos = ColaPedidos([])
 facturacion = Facturacion([])
@@ -122,7 +140,9 @@ while True:
     print("|  1. Tomar un pedido")
     print("|  2. Ver la cola de pedidos")
     print("|  3. Generar una factura")
-    print("|  4. Salir")
+    print("|  4. Agregar cantidad de productos al inventario")
+    print("|  5. Mostrar inventario")
+    print("|  6. Salir")
     print("-"*45)
     opcion = input("Opción: ")
 
@@ -202,6 +222,27 @@ while True:
             print("No hay pedidos en la cola.")
 
     elif opcion == "4":
+        print("Productos disponibles para agregar al inventario:")
+        for i, producto in enumerate(inventario.productos, 1):
+            print(f"{i}. {producto}")
+
+        try:
+            seleccion = int(input("Seleccione el número del producto que desea agregar al inventario: "))
+            productos_disponibles = list(inventario.productos.keys())
+            if 1 <= seleccion <= len(productos_disponibles):
+                producto = productos_disponibles[seleccion - 1]
+                cantidad = int(input(f"Ingrese la cantidad de {producto} a agregar al inventario: "))
+                inventario.agregar_inventario(producto, cantidad)
+                print(f"Se agregaron {cantidad} {producto}(s) al inventario.")
+            else:
+                print("Número de producto no válido. Intente nuevamente.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+
+    elif opcion == "5":
+        inventario.mostrar_inventario()
+
+    elif opcion == "6":
         break
 
     else:
