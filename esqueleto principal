@@ -1,15 +1,24 @@
 class Pedido:
-    def __init__(self, alimentos, bebidas, opciones_personalizadas):
+    def __init__(self, alimentos, bebidas, opciones_personalizadas, cliente = None):
         self.alimentos = alimentos
         self.bebidas = bebidas
         self.opciones_personalizadas = opciones_personalizadas
+        self.cliente = cliente
+
 
 class Inventario:
     def __init__(self, productos):
         self.productos = productos
 
     def actualizar_inventario(self, pedido):
-        pass
+        for alimento in pedido.alimentos:
+            if alimento in self.productos:
+                self.productos[alimento] -= 1
+
+        for bebida in pedido.bebidas:
+            if bebida in self.productos:
+                self.productos[bebida] -= 1
+
 
 class Menu:
     def __init__(self, platillos, bebidas, precios):
@@ -18,52 +27,182 @@ class Menu:
         self.precios = precios
 
     def mostrar_menu(self):
-        pass
+        print("Menu:")
+
+        for i in range(len(self.platillos)):
+            print(f"{i+1}. {self.platillos[i]} - Q{self.precios[i]}")
+
+        for i in range(len(self.bebidas)):
+            print(f"{i+len(self.platillos)+1}. {self.bebidas[i]} - Q{self.precios[i+len(self.platillos)]}")
+
 
 class ColaPedidos:
     def __init__(self, pedidos):
         self.pedidos = pedidos
 
     def agregar_pedido(self, pedido):
-        pass
+        self.pedidos.append(pedido)
 
     def mostrar_pedidos(self):
-        pass
+        if not self.pedidos:
+            print("La cola de pedidos está vacía.")
+        else:
+            print("Cola de Pedidos:")
+            for i, pedido in enumerate(self.pedidos):
+                print(f"Pedido {i + 1}: {pedido.alimentos}, {pedido.bebidas}, {pedido.opciones_personalizadas}")
+
 
 class Facturacion:
     def __init__(self, pedidos):
         self.pedidos = pedidos
 
-    def generar_factura(self, pedido):
-        pass
 
-    def procesar_pago(self, pedido, metodo_pago):
-        pass
+    def generar_factura(self, pedido, metodo_pago, cliente):
+        print("-"*40)
+        print("\n---*** Factura ***---")
+        print(f"Cliente: {cliente.nombre}")
+        print(f"Dirección: {cliente.direccion}")
+        print(f"Teléfono: {cliente.telefono}")
+        print(f"NIT: {cliente.nit}")
+        print('')
+        print("Teléfono de contacto: 8894-4563")
+        print("-" * 40)
+        print("Descripción del pedido:")
+
+        for alimento in pedido.alimentos:
+            print(f" {alimento}: Q{menu.precios[menu.platillos.index(alimento)]}")
+
+        for bebida in pedido.bebidas:
+            print(f" {bebida}: Q{menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)]}")
+
+        print("-" * 30)
+
+        total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
+                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
+        print(f"Total a pagar: Q{total}")
+        print("¡Gracias por su compra!")
+        print("-" * 30)
+        print("")
+        print("")
+        print(f"Pago del pedido procesado con {metodo_pago}")
+
 
 class Cliente:
-    def __init__(self, nombre, direccion, telefono):
+    def __init__(self, nombre, direccion, telefono, nit, metodo_pago):
         self.nombre = nombre
         self.direccion = direccion
         self.telefono = telefono
+        self.nit = nit
+        self.metodo_pago = metodo_pago
 
 class AdministracionClientes:
     def __init__(self, clientes):
         self.clientes = clientes
 
     def agregar_cliente(self, cliente):
-        pass
+        self.clientes.append(cliente)
 
-    def mostrar_clientes(self):
-        pass
+    def buscar_cliente_por_nit(self, nit):
+        for i, cliente in enumerate(self.clientes):
+            if cliente.nit == nit:
+                return i
+        return -1
 
+menu = Menu(["Hamburguesa", "Pizza"], ["Refresco", "Agua"], [25, 40, 10, 7])
+inventario = Inventario({"Hamburguesa": 10, "Pizza": 5, "Refresco": 20, "Agua": 15})
+cola_pedidos = ColaPedidos([])
+facturacion = Facturacion([])
+admin_clientes = AdministracionClientes([])
 
 while True:
-    print("Bienvenido al sistema de gestión de pedidos.")
-    print("Por favor, seleccione una opción:")
-    print("1. Tomar un pedido")
-    print("2. Ver la cola de pedidos")
-    print("3. Generar una factura")
-    print("4. Salir")
-
+    print("-"*45)
+    print("|  Bienvenido al restaurante Rata feliz :3.")
+    print("|")
+    print("|  Por favor, seleccione una opción:")
+    print("|  1. Tomar un pedido")
+    print("|  2. Ver la cola de pedidos")
+    print("|  3. Generar una factura")
+    print("|  4. Salir")
+    print("-"*45)
     opcion = input("Opción: ")
 
+    if opcion == "1":
+        menu.mostrar_menu()
+        alimentos = []
+        bebidas = []
+        opciones_personalizadas = []
+
+        while True:
+            opcion = input("Seleccione lo que desea consumir (presione 0 para terminar): ")
+
+            if opcion == "0":
+                break
+            elif opcion.isdigit() and int(opcion) in range(1, len(menu.platillos) + len(menu.bebidas) + 1):
+
+                opcion = int(opcion)
+
+                if opcion <= len(menu.platillos):
+                    alimentos.append(menu.platillos[opcion - 1])
+                else:
+                    bebidas.append(menu.bebidas[opcion - len(menu.platillos) - 1])
+
+        while True:
+
+            decea = input('Decea agregar nit (S/N): ').strip().lower()
+
+            if decea == 's':
+                nit_buscar = input("Ingrese el NIT del cliente: ")
+                metodo_pago = input("Método de pago del cliente: ")
+
+                resultado = admin_clientes.buscar_cliente_por_nit(nit_buscar)
+
+                if resultado != -1:
+                    cliente = admin_clientes.clientes[resultado]
+                    cliente.metodo_pago = metodo_pago
+                    print(f'Cliente encontrado en la posición {resultado}:')
+                    print(f'Nombre: {cliente.nombre}')
+                    print(f'Dirección: {cliente.direccion}')
+                    print(f'Teléfono: {cliente.telefono}')
+                    print(f'NIT: {cliente.nit}')
+                else:
+                    print('')
+                    print('Cliente no registrado, tomo los siguientes datos')
+                    nombre = input("Nombre del cliente: ")
+                    direccion = input("Dirección del cliente: ")
+                    telefono = input("Teléfono del cliente: ")
+                    nit = nit_buscar
+                    
+                    cliente = Cliente(nombre, direccion, telefono, nit, metodo_pago)
+                    admin_clientes.agregar_cliente(cliente)
+
+                break
+
+            elif decea == 'n':
+                print('C/F')
+                metodo_pago = input("Método de pago del cliente: ") 
+                cliente = Cliente("C/F", "No Aplica", "No Aplica", "No aplica", metodo_pago)
+                break
+
+            else:
+                print('Opcion no valida')
+
+
+        pedido = Pedido(alimentos, bebidas, opciones_personalizadas, cliente)
+        cola_pedidos.agregar_pedido(pedido)
+        inventario.actualizar_inventario(pedido)
+
+    elif opcion == "2":
+        cola_pedidos.mostrar_pedidos()
+
+    elif opcion == "3":
+        if cola_pedidos.pedidos:
+            facturacion.generar_factura(cola_pedidos.pedidos[0], cola_pedidos.pedidos[0].cliente.metodo_pago, cola_pedidos.pedidos[0].cliente)
+            cola_pedidos.pedidos.pop(0)
+        else:
+            print("No hay pedidos en la cola.")
+
+    elif opcion == "4":
+        break
+
+    else:
+        print("Opción inválida. Por favor, seleccione una opción válida.")
