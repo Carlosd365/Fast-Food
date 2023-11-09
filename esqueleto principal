@@ -84,10 +84,12 @@ class Facturacion:
 
 
 class Cliente:
-    def __init__(self, nombre, direccion, telefono):
+    def __init__(self, nombre, direccion, telefono, nit, metodo_pago):
         self.nombre = nombre
         self.direccion = direccion
         self.telefono = telefono
+        self.nit = nit
+        self.metodo_pago = metodo_pago
 
 
 class AdministracionClientes:
@@ -97,13 +99,11 @@ class AdministracionClientes:
     def agregar_cliente(self, cliente):
         self.clientes.append(cliente)
 
-    def mostrar_clientes(self):
-        if not self.clientes:
-            print("No hay clientes registrados.")
-        else:
-            print("Lista de Clientes:")
-            for i, cliente in enumerate(self.clientes):
-                print(f"Cliente {i + 1}: {cliente.nombre}, {cliente.direccion}, {cliente.telefono}")
+    def buscar_cliente_por_nit(self, nit):
+        for i, cliente in enumerate(self.clientes):
+            if cliente.nit == nit:
+                return i
+        return -1
 
 
 menu = Menu(["Hamburguesa", "Pizza"], ["Refresco", "Agua"], [25, 40, 10, 7])
@@ -143,6 +143,45 @@ while True:
                     alimentos.append(menu.platillos[opcion - 1])
                 else:
                     bebidas.append(menu.bebidas[opcion - len(menu.platillos) - 1])
+
+        while True:
+
+            decea = input('Decea agregar nit (S/N): ').strip().lower()
+
+            if decea == 's':
+                nit_buscar = input("Ingrese el NIT del cliente: ")
+
+                resultado = admin_clientes.buscar_cliente_por_nit(nit_buscar)
+
+                if resultado != -1:
+                    cliente_encontrado = admin_clientes.clientes[resultado]
+                    print(f'Cliente encontrado en la posición {resultado}:')
+                    print(f'Nombre: {cliente_encontrado.nombre}')
+                    print(f'Dirección: {cliente_encontrado.direccion}')
+                    print(f'Teléfono: {cliente_encontrado.telefono}')
+                    print(f'NIT: {cliente_encontrado.nit}')
+                    print(f'Método de pago: {cliente_encontrado.metodo_pago}')
+                else:
+                    print('')
+                    print('Cliente no registrado, tomo los siguientes datos')
+                    nombre = input("Nombre del cliente: ")
+                    direccion = input("Dirección del cliente: ")
+                    telefono = input("Teléfono del cliente: ")
+                    nit = input("NIT del cliente: ")
+                    metodo_pago = input("Método de pago del cliente: ")
+                    
+                    nuevo_cliente = Cliente(nombre, direccion, telefono, nit, metodo_pago)
+                    admin_clientes.agregar_cliente(nuevo_cliente)
+
+                break
+
+            elif decea == 'n':
+                print('C/F')
+                break
+
+            else:
+                print('Opcion no valida')
+
 
         pedido = Pedido(alimentos, bebidas, opciones_personalizadas)
         cola_pedidos.agregar_pedido(pedido)
