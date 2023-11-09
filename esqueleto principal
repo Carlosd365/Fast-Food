@@ -56,7 +56,7 @@ class Facturacion:
         self.pedidos = pedidos
 
 
-    def generar_factura(self, pedido):
+    def generar_factura(self, pedido, metodo_pago):
         print("-"*40)
         print("\n---*** Factura ***---")
         print("Teléfono de contacto: 8894-4563")
@@ -78,19 +78,15 @@ class Facturacion:
         print("-" * 30)
         print("")
         print("")
-
-    def procesar_pago(self, metodo_pago):
         print(f"Pago del pedido procesado con {metodo_pago}")
 
 
 class Cliente:
-    def __init__(self, nombre, direccion, telefono, nit, metodo_pago):
+    def __init__(self, nombre, direccion, telefono, nit):
         self.nombre = nombre
         self.direccion = direccion
         self.telefono = telefono
         self.nit = nit
-        self.metodo_pago = metodo_pago
-
 
 class AdministracionClientes:
     def __init__(self, clientes):
@@ -104,7 +100,6 @@ class AdministracionClientes:
             if cliente.nit == nit:
                 return i
         return -1
-
 
 menu = Menu(["Hamburguesa", "Pizza"], ["Refresco", "Agua"], [25, 40, 10, 7])
 inventario = Inventario({"Hamburguesa": 10, "Pizza": 5, "Refresco": 20, "Agua": 15})
@@ -144,6 +139,8 @@ while True:
                 else:
                     bebidas.append(menu.bebidas[opcion - len(menu.platillos) - 1])
 
+        pago = input("Método de pago del cliente: ")
+
         while True:
 
             decea = input('Decea agregar nit (S/N): ').strip().lower()
@@ -160,17 +157,15 @@ while True:
                     print(f'Dirección: {cliente_encontrado.direccion}')
                     print(f'Teléfono: {cliente_encontrado.telefono}')
                     print(f'NIT: {cliente_encontrado.nit}')
-                    print(f'Método de pago: {cliente_encontrado.metodo_pago}')
                 else:
                     print('')
                     print('Cliente no registrado, tomo los siguientes datos')
                     nombre = input("Nombre del cliente: ")
                     direccion = input("Dirección del cliente: ")
                     telefono = input("Teléfono del cliente: ")
-                    nit = input("NIT del cliente: ")
-                    metodo_pago = input("Método de pago del cliente: ")
+                    nit = nit_buscar
                     
-                    nuevo_cliente = Cliente(nombre, direccion, telefono, nit, metodo_pago)
+                    nuevo_cliente = Cliente(nombre, direccion, telefono, nit)
                     admin_clientes.agregar_cliente(nuevo_cliente)
 
                 break
@@ -192,8 +187,7 @@ while True:
 
     elif opcion == "3":
         if cola_pedidos.pedidos:
-            facturacion.generar_factura(cola_pedidos.pedidos[0])
-            facturacion.procesar_pago(cola_pedidos.pedidos[0])
+            facturacion.generar_factura(cola_pedidos.pedidos[0], pago)
             cola_pedidos.pedidos.pop(0)
         else:
             print("No hay pedidos en la cola.")
