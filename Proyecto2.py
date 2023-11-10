@@ -88,6 +88,7 @@ class ColaPedidos:
         else:
             print("Cola de Pedidos:")
             for i, pedido in enumerate(self.pedidos, 1):
+                print('')
                 print(f"Pedido {i}:")
                 print(f"  Alimentos: {', '.join(pedido.alimentos)}")
                 print(f"  Bebidas: {', '.join(pedido.bebidas)}")
