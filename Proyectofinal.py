@@ -1,3 +1,51 @@
+class InventariFacturas:
+    def __init__(self):
+        self.nomfactu = []
+        self.direcfactu = []
+        self.telfactu = []
+        self.nitfactu = []
+        self.total = []
+
+    def agregar(self,pedido, metodo_pago, cliente):
+        self.nomfactu.append(cliente.nombre)
+        self.direcfactu.append(cliente.direccion)
+        self.telfactu.append(cliente.telefono)
+        self.nitfactu.append(cliente.nit)
+        total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
+                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
+        self.total.append(total)
+
+    def mostrar(self):
+        if len(self.nomfactu) > 0:
+            n = len(self.total)
+            for i in range(n):
+                for j in range(0,n-i-1):
+                    if self.total[j]>self.total[j+1]:
+                        self.total[j],self.total[j+1]=self.total[j+1],self.total[j]
+                        self.nomfactu[j],self.nomfactu[j+1]=self.nomfactu[j+1],self.nomfactu[j]
+                        self.telfactu[j],self.telfactu[j+1]=self.telfactu[j+1],self.telfactu[j]
+                        self.direcfactu[j],self.direcfactu[j+1]=self.direcfactu[j+1],self.direcfactu[j]
+                        self.nitfactu[j],self.nitfactu[j+1]=self.nitfactu[j+1],self.nitfactu[j]
+        
+            for i in range(0,len(self.nomfactu)):
+                print("-"*40)
+                print("\n---*** Factura ***---")
+                print(f"Cliente: {self.nomfactu[i]}")
+                print(f"Dirección: {self.direcfactu[i]}")
+                print(f"Teléfono: {self.telfactu[i]}")
+                print(f"NIT: {self.nitfactu[i]}")
+                print('')
+                print('Restaurante Rata feliz')
+                print("Teléfono de contacto: 8894-4563")
+                print("-" * 30)            
+                print(f"Total a pagar: Q{self.total[i]}")
+                print("¡Gracias por su compra!")
+                print("-" * 30)
+                print(f"Pago del pedido procesado con {metodo_pago}")
+                print("")
+        else :
+            print("No hay facturas")
+                
 class Pedido:
     def __init__(self, alimentos, bebidas, opciones_personalizadas, cliente = None):
         self.alimentos = alimentos
@@ -67,6 +115,7 @@ class Menu:
         self.opciones_extra = opciones_extra
 
     def mostrar_menu(self):
+        print('')
         print("Menu:")
 
         for i in range(len(self.platillos)):
@@ -115,6 +164,7 @@ class Facturacion:
         print(f"Teléfono: {cliente.telefono}")
         print(f"NIT: {cliente.nit}")
         print('')
+        print('Restaurante Rata feliz')
         print("Teléfono de contacto: 8894-4563")
         print("-" * 40)
         print("Descripción del pedido:")
@@ -168,6 +218,7 @@ inventario = Inventario({"Hamburguesa🍔": 10, "Pizza🍕": 5, "Refresco🧋": 
 cola_pedidos = ColaPedidos([])
 facturacion = Facturacion([])
 admin_clientes = AdministracionClientes([])
+factura = InventariFacturas()
 
 while True:
     print("-"*45)
@@ -176,7 +227,7 @@ while True:
     print("|  Por favor, seleccione una opción:")
     print("|  1. Tomar un pedido")
     print("|  2. Ver la cola de pedidos")
-    print("|  3. Generar una factura")
+    print("|  3. Gestion de facturas")
     print("|  4. Agregar cantidad de productos al inventario")
     print("|  5. Mostrar inventario")
     print("|  6. Salir")
@@ -184,12 +235,12 @@ while True:
     opcion = input("Opción: ")
 
     if opcion == "1":
-        menu.mostrar_menu()
         alimentos = []
         bebidas = []
         opciones_personalizadas = []
 
         while True:
+            menu.mostrar_menu()
             print('')
             opcion = input("Seleccione lo que desea consumir (presione 0 para terminar): ")
 
@@ -265,11 +316,19 @@ while True:
         cola_pedidos.mostrar_pedidos()
 
     elif opcion == "3":
-        if cola_pedidos.pedidos:
-            facturacion.generar_factura(cola_pedidos.pedidos[0], cola_pedidos.pedidos[0].cliente.metodo_pago, cola_pedidos.pedidos[0].cliente)
-            cola_pedidos.pedidos.pop(0)
-        else:
-            print("No hay pedidos en la cola.")
+        print("1. Generar factura\n2. Ver facturas\n")
+        t = input("Selecione una opcion: ")
+        if t == "1":
+            if cola_pedidos.pedidos:
+                facturacion.generar_factura(cola_pedidos.pedidos[0], cola_pedidos.pedidos[0].cliente.metodo_pago, cola_pedidos.pedidos[0].cliente)
+                factura.agregar(cola_pedidos.pedidos[0], cola_pedidos.pedidos[0].cliente.metodo_pago, cola_pedidos.pedidos[0].cliente)
+                cola_pedidos.pedidos.pop(0)
+            else:
+                print("No hay pedidos en la cola.")
+        elif t == "2":
+            factura.mostrar()
+        else :
+            print("Opción invalida")
 
     elif opcion == "4":
         print('')
