@@ -5,6 +5,8 @@ class Pedido:
         self.opciones_personalizadas = opciones_personalizadas
         self.cliente = cliente
 
+    def agregar_opcion_personalizada(self, alimento, opcion, costo):
+        self.opciones_personalizadas.append({"alimento": alimento, "opcion": opcion, "costo": costo})
 
 class Inventario:
     def __init__(self, productos):
@@ -34,25 +36,44 @@ class Inventario:
             self.productos[producto] = cantidad
 
     def mostrar_inventario(self):
+        print('')
         print("Inventario:")
         for producto, cantidad in self.productos.items():
             print(f"{producto}: {cantidad}")
+            print('')
+
+class OpcionesExtra:
+    def __init__(self):
+        self.opciones = {
+            "Hamburguesa🍔": {"Queso extra": 5, "Carne extra": 10, "Agrandado": 8},
+            "Pizza🍕": {"Queso extra": 5, "Queso en la orilla": 7},
+            "Refresco🧋": {"Refil": 3}
+        }
+
+    def mostrar_opciones(self, alimento):
+        if alimento in self.opciones:
+            print(f"\nOpciones adicionales para {alimento}:")
+            opciones_alimento = self.opciones[alimento]
+            for opcion, costo in opciones_alimento.items():
+                print(f"{opcion}: Q{costo}")
+        else:
+            print(f"No hay opciones adicionales disponibles para {alimento}.")
 
 class Menu:
-    def __init__(self, platillos, bebidas, precios):
+    def __init__(self, platillos, bebidas, precios, opciones_extra):
         self.platillos = platillos
         self.bebidas = bebidas
         self.precios = precios
+        self.opciones_extra = opciones_extra
 
     def mostrar_menu(self):
         print("Menu:")
 
         for i in range(len(self.platillos)):
-            print(f"{i+1}. {self.platillos[i]} - Q{self.precios[i]}")
+            print(f"{i + 1}. {self.platillos[i]} - Q{self.precios[i]}")
 
         for i in range(len(self.bebidas)):
-            print(f"{i+len(self.platillos)+1}. {self.bebidas[i]} - Q{self.precios[i+len(self.platillos)]}")
-
+            print(f"{i + len(self.platillos) + 1}. {self.bebidas[i]} - Q{self.precios[i + len(self.platillos)]}")
 
 class ColaPedidos:
     def __init__(self, pedidos):
@@ -66,14 +87,25 @@ class ColaPedidos:
             print("La cola de pedidos está vacía.")
         else:
             print("Cola de Pedidos:")
-            for i, pedido in enumerate(self.pedidos):
-                print(f"Pedido {i + 1}: {pedido.alimentos}, {pedido.bebidas}, {pedido.opciones_personalizadas}")
-
+            for i, pedido in enumerate(self.pedidos, 1):
+                print('')
+                print(f"Pedido {i}:")
+                print(f"  Alimentos: {', '.join(pedido.alimentos)}")
+                print(f"  Bebidas: {', '.join(pedido.bebidas)}")
+                print('')
+                print("  Opciones Personalizadas:")
+                for opcion in pedido.opciones_personalizadas:
+                    print(f"    {opcion['opcion']} para {opcion['alimento']}: Q{opcion['costo']}")
 
 class Facturacion:
     def __init__(self, pedidos):
         self.pedidos = pedidos
 
+    def calcular_precio_opciones_adicionales(self, opciones_personalizadas):
+        total_opciones_adicionales = 0
+        for opcion_personalizada in opciones_personalizadas:
+            total_opciones_adicionales += opcion_personalizada["costo"]
+        return total_opciones_adicionales
 
     def generar_factura(self, pedido, metodo_pago, cliente):
         print("-"*40)
@@ -93,17 +125,21 @@ class Facturacion:
         for bebida in pedido.bebidas:
             print(f" {bebida}: Q{menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)]}")
 
-        print("-" * 30)
+        opciones_total = self.calcular_precio_opciones_adicionales(pedido.opciones_personalizadas)
+        if opciones_total > 0:
+            print("\nOpciones adicionales:")
+            for opcion in pedido.opciones_personalizadas:
+                print(f" {opcion['opcion']} para {opcion['alimento']}: Q{opcion['costo']}")
 
         total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
-                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
+                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas]) + opciones_total
+
+        print("-" * 30)
         print(f"Total a pagar: Q{total}")
         print("¡Gracias por su compra!")
         print("-" * 30)
-        print("")
-        print("")
         print(f"Pago del pedido procesado con {metodo_pago}")
-
+        print("")
 
 class Cliente:
     def __init__(self, nombre, direccion, telefono, nit, metodo_pago):
@@ -126,7 +162,8 @@ class AdministracionClientes:
                 return i
         return -1
 
-menu = Menu(["Hamburguesa🍔", "Pizza🍕"], ["Refresco🧋", "Agua🫗"], [25, 40, 10, 7])
+opciones_extra = OpcionesExtra()
+menu = Menu(["Hamburguesa🍔", "Pizza🍕"], ["Refresco🧋", "Agua🫗"], [25, 40, 10, 7], opciones_extra)
 inventario = Inventario({"Hamburguesa🍔": 10, "Pizza🍕": 5, "Refresco🧋": 20, "Agua🫗": 15})
 cola_pedidos = ColaPedidos([])
 facturacion = Facturacion([])
@@ -153,6 +190,7 @@ while True:
         opciones_personalizadas = []
 
         while True:
+            print('')
             opcion = input("Seleccione lo que desea consumir (presione 0 para terminar): ")
 
             if opcion == "0":
@@ -163,8 +201,21 @@ while True:
 
                 if opcion <= len(menu.platillos):
                     alimentos.append(menu.platillos[opcion - 1])
+                    alimento_seleccionado = menu.platillos[opcion - 1]
                 else:
                     bebidas.append(menu.bebidas[opcion - len(menu.platillos) - 1])
+                    alimento_seleccionado = menu.bebidas[opcion - len(menu.platillos) - 1]
+
+                opciones_extra.mostrar_opciones(alimento_seleccionado)
+                confirmacion = input(f"\n¿Desea opciones adicionales para {alimento_seleccionado}? (S/N): ").strip().lower()
+
+                if confirmacion == 's':
+                    opciones_alimento = opciones_extra.opciones[alimento_seleccionado]
+                    for opcion, costo in opciones_alimento.items():
+                        confirmacion_opcion = input(f"¿Desea {opcion} por Q{costo}? (S/N): ").strip().lower()
+                        if confirmacion_opcion == 's':
+                            opciones_personalizadas.append({"alimento": alimento_seleccionado, "opcion": opcion, "costo": costo})
+                            print(f"Se agregó {opcion} por Q{costo} al pedido.")
 
         while True:
 
@@ -198,14 +249,13 @@ while True:
                 break
 
             elif decea == 'n':
-                print('C/F')
+                print('')
                 metodo_pago = input("Método de pago del cliente: ") 
                 cliente = Cliente("C/F", "No Aplica", "No Aplica", "No aplica", metodo_pago)
                 break
 
             else:
                 print('Opcion no valida')
-
 
         pedido = Pedido(alimentos, bebidas, opciones_personalizadas, cliente)
         cola_pedidos.agregar_pedido(pedido)
@@ -222,6 +272,7 @@ while True:
             print("No hay pedidos en la cola.")
 
     elif opcion == "4":
+        print('')
         print("Productos disponibles para agregar al inventario:")
         for i, producto in enumerate(inventario.productos, 1):
             print(f"{i}. {producto}")
@@ -234,10 +285,13 @@ while True:
                 cantidad = int(input(f"Ingrese la cantidad de {producto} a agregar al inventario: "))
                 inventario.agregar_inventario(producto, cantidad)
                 print(f"Se agregaron {cantidad} {producto}(s) al inventario.")
+                print('')
             else:
                 print("Número de producto no válido. Intente nuevamente.")
+                print('')
         except ValueError:
             print("Por favor, ingrese un número válido.")
+            print('')
 
     elif opcion == "5":
         inventario.mostrar_inventario()
