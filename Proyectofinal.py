@@ -42,11 +42,14 @@ class InventariFacturas:
                 print(f"Teléfono: {self.telfactu[i]}")
                 print(f"NIT: {self.nitfactu[i]}")
                 print('')
+                print('Restaurante Rata feliz')
                 print("Teléfono de contacto: 8894-4563")
-                print("-" * 40)
+                print("-" * 30)            
                 print(f"Total a pagar: Q{self.total[i]}")
                 print("¡Gracias por su compra!")
                 print("-" * 30)
+                print(f"Pago del pedido procesado con {metodo_pago}")
+                print("")
         else :
             print("No hay facturas")
                 
@@ -119,6 +122,7 @@ class Menu:
         self.opciones_extra = opciones_extra
 
     def mostrar_menu(self):
+        print('')
         print("Menu:")
 
         for i in range(len(self.platillos)):
@@ -167,6 +171,7 @@ class Facturacion:
         print(f"Teléfono: {cliente.telefono}")
         print(f"NIT: {cliente.nit}")
         print('')
+        print('Restaurante Rata feliz')
         print("Teléfono de contacto: 8894-4563")
         print("-" * 40)
         print("Descripción del pedido:")
@@ -318,7 +323,8 @@ while True:
         cola_pedidos.mostrar_pedidos()
 
     elif opcion == "3":
-        t = input("1. Generar factura\n2. Ver facturas\n")
+        print("1. Generar factura\n2. Ver facturas\n")
+        t = input("Selecione una opcion: ")
         if t == "1":
             if cola_pedidos.pedidos:
                 facturacion.generar_factura(cola_pedidos.pedidos[0], cola_pedidos.pedidos[0].cliente.metodo_pago, cola_pedidos.pedidos[0].cliente)
