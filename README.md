@@ -19,3 +19,5 @@ Fast-Food es nuestro segundo proyecto de programacion avanzada, este proyecto no
 
 ## Manuales de uso
 Puede encontrar el Manual de Usuario de nuestro proyecto en el siguiente enlace: [Maual de Usuario](https://publuu.com/flip-book/297630/691535).
+
+Puede encontrar el Manual técnico de nuestro proyecto en el siguiente enlace: [Maual técnico](https://publuu.com/flip-book/297630/691643).
