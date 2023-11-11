@@ -6,13 +6,20 @@ class InventariFacturas:
         self.nitfactu = []
         self.total = []
 
+    def calcular_precio_adicionales(self, opciones_personalizadas):
+        total_opciones_adicionales = 0
+        for opcion_personalizada in opciones_personalizadas:
+            total_opciones_adicionales += opcion_personalizada["costo"]
+        return total_opciones_adicionales
+
     def agregar(self,pedido, metodo_pago, cliente):
         self.nomfactu.append(cliente.nombre)
         self.direcfactu.append(cliente.direccion)
         self.telfactu.append(cliente.telefono)
         self.nitfactu.append(cliente.nit)
+        opciones_total = self.calcular_precio_adicionales(pedido.opciones_personalizadas)
         total = sum([menu.precios[menu.platillos.index(alimento)] for alimento in pedido.alimentos] +
-                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas])
+                    [menu.precios[len(menu.platillos) + menu.bebidas.index(bebida)] for bebida in pedido.bebidas]) + opciones_total
         self.total.append(total)
 
     def mostrar(self):
